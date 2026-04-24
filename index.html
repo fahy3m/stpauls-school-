@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Saint Paul's R/C Basic School</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --g: #1a5c38; --gd: #0d3d25; --gm: #226b43; --gl: #2e8b57; --gp: #f0f7f3;
+      --gold: #c9a84c; --goldl: #e8c96a; --goldp: #fdf8ee;
+      --w: #fff; --g50: #f9fafb; --g100: #f3f4f6; --g200: #e5e7eb; --g300: #d1d5db;
+      --g400: #9ca3af; --g500: #6b7280; --g600: #4b5563; --g700: #374151; --g800: #1f2937;
+      --red: #dc2626; --redl: #fef2f2; --blue: #2563eb; --bluel: #eff6ff;
+      --amber: #d97706; --amberl: #fffbeb; --purple: #7c3aed; --purplel: #f3e8ff;
+      --sb: 260px; --tb: 64px; --r: 14px; --rsm: 8px;
+      --sh: 0 4px 24px rgba(0,0,0,.08); --shm: 0 8px 32px rgba(0,0,0,.12); --shs: 0 2px 8px rgba(0,0,0,.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--g100); color: var(--g800); min-height: 100vh; }
+
+    /* ===== LOGIN ===== */
+    #loginPage { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--gd) 0%, var(--g) 55%, var(--gl) 100%); position: relative; overflow: hidden; }
+    #loginPage::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E"); }
+    .lcard { background: var(--w); border-radius: 20px; padding: 52px 44px; width: 100%; max-width: 440px; box-shadow: 0 32px 80px rgba(0,0,0,.35); position: relative; z-index: 1; animation: riseUp .5s cubic-bezier(.16,1,.3,1); }
+    @keyframes riseUp { from { opacity: 0; transform: translateY(40px) } to { opacity: 1; transform: translateY(0) } }
+    .lemblem { width: 80px; height: 80px; background: linear-gradient(135deg, var(--gd), var(--gl)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 12px 32px rgba(26,92,56,.4); overflow: hidden; }
+    .lemblem img { width: 100%; height: 100%; object-fit: contain; }
+    .lemblem i { color: var(--goldl); font-size: 36px; }
+    .lschool { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--gd); text-align: center; line-height: 1.3; font-weight: 700; }
+    .ltag { text-align: center; color: var(--g500); font-size: 11px; margin-bottom: 32px; letter-spacing: 1px; text-transform: uppercase; }
+    .ldiv { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin-bottom: 28px; }
+    .fg { margin-bottom: 18px; }
+    .fg label { display: block; font-size: 11px; font-weight: 700; color: var(--g600); margin-bottom: 7px; letter-spacing: .5px; text-transform: uppercase; }
+    .fg input { width: 100%; padding: 13px 16px; border: 2px solid var(--g200); border-radius: 10px; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s; background: var(--g50); }
+    .fg input:focus { outline: none; border-color: var(--g); background: white; box-shadow: 0 0 0 4px rgba(26,92,56,.08); }
+    .fg input:focus-visible { outline: 3px solid var(--g); outline-offset: 2px; }
+    .btnLogin { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gd), var(--gl)); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s; box-shadow: 0 6px 20px rgba(26,92,56,.35); }
+    .btnLogin:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,92,56,.45); }
+    .btnLogin:focus-visible { outline: 3px solid var(--goldl); outline-offset: 3px; }
+    .btnLogin:disabled { opacity: 0.6; cursor: not-allowed; }
+    .lerr { background: var(--redl); color: var(--red); padding: 11px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
+    .lspinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(26,92,56,.2); border-top-color: var(--g); border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg) } }
+
+    /* ===== APP SHELL ===== */
+    #app { display: none; min-height: 100vh; }
+    .sb { position: fixed; left: 0; top: 0; bottom: 0; width: var(--sb); background: linear-gradient(180deg, var(--gd) 0%, var(--gm) 100%); display: flex; flex-direction: column; z-index: 200; box-shadow: 4px 0 32px rgba(0,0,0,.2); transition: transform .3s cubic-bezier(.16,1,.3,1); }
+    .sbH { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .sbLogo { display: flex; align-items: center; gap: 12px; }
+    .sbLI { width: 44px; height: 44px; background: linear-gradient(135deg, var(--gold), var(--goldl)); border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(201,168,76,.4); overflow: hidden; }
+    .sbLI img { width: 100%; height: 100%; object-fit: contain; }
+    .sbLI i { color: var(--gd); font-size: 19px; }
+    .sbN { color: white; }
+    .sbNm { font-family: 'Cormorant Garamond', serif; font-size: 13px; line-height: 1.3; font-weight: 700; }
+    .sbNs { font-size: 10px; color: rgba(255,255,255,.6); margin-top: 2px; letter-spacing: .5px; }
+    .sbNav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+    .ni { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 10px; color: rgba(255,255,255,.75); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; margin-bottom: 2px; background: none; border: none; width: 100%; text-align: left; font-family: inherit; }
+    .ni:hover { background: rgba(255,255,255,.1); color: white; }
+    .ni.active { background: linear-gradient(135deg, var(--gold), var(--goldl)); color: var(--gd); font-weight: 700; }
+    .ni:focus-visible { outline: 2px solid var(--goldl); outline-offset: -2px; }
+    .ni i { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; }
+    .sbFt { padding: 12px; border-top: 1px solid rgba(255,255,255,.08); }
+    .uChip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.07); }
+    .uAv { width: 34px; height: 34px; background: linear-gradient(135deg, var(--gold), var(--goldl)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--gd); font-size: 13px; flex-shrink: 0; }
+    .uDet { flex: 1; min-width: 0; }
+    .uNm { color: white; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .uRl { color: rgba(255,255,255,.55); font-size: 10px; }
+    .btnLo { background: none; border: none; color: rgba(255,255,255,.55); cursor: pointer; padding: 6px; font-size: 14px; transition: color .2s; flex-shrink: 0; border-radius: 6px; }
+    .btnLo:hover { color: white; }
+    .btnLo:focus-visible { outline: 2px solid var(--goldl); }
+
+    .sbOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 199; }
+    .sbOverlay.show { display: block; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main { margin-left: var(--sb); min-height: 100vh; }
+    .topbar { height: var(--tb); background: white; border-bottom: 1px solid var(--g200); display: flex; align-items: center; justify-content: space-between; padding: 0 26px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shs); }
+    .pgTitle { font-family: 'Cormorant Garamond', serif; font-size: 23px; color: var(--gd); font-weight: 700; }
+    .addr { font-size: 11px; color: var(--g600); text-align: right; line-height: 1.6; }
+    .hbg { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--g600); padding: 6px; border-radius: 6px; }
+    .hbg:focus-visible { outline: 2px solid var(--g); }
+    @media(max-width: 768px) {
+      .hbg { display: block; }
+      .sb { transform: translateX(-100%); }
+      .sb.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+    }
+
+    /* ===== CONTENT ===== */
+    .content { padding: 26px; }
+    .sec { display: none; }
+    .sec.active { display: block; animation: fadeUp .3s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
+    .secH { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 15px; }
+    .secH h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--gd); }
+
+    /* ===== STAT CARDS ===== */
+    .sGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 22px; }
+    .sCrd { background: white; border-radius: var(--r); padding: 20px; box-shadow: var(--shs); display: flex; align-items: center; gap: 14px; transition: transform .2s, box-shadow .2s; border: 1px solid var(--g100); }
+    .sCrd:hover { transform: translateY(-3px); box-shadow: var(--shm); }
+    .sIco { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .iGreen { background: rgba(26,92,56,.1); color: var(--g); }
+    .iGold { background: rgba(201,168,76,.15); color: var(--amber); }
+    .iBlue { background: var(--bluel); color: var(--blue); }
+    .iRed { background: var(--redl); color: var(--red); }
+    .sVal { font-size: 28px; font-weight: 800; color: var(--g800); line-height: 1; }
+    .sLbl { font-size: 12px; color: var(--g600); margin-top: 3px; font-weight: 500; }
+
+    /* ===== CARDS ===== */
+    .card { background: white; border-radius: var(--r); box-shadow: var(--shs); overflow: hidden; border: 1px solid var(--g100); margin-bottom: 22px; }
+    .cHead { padding: 16px 20px; border-bottom: 1px solid var(--g100); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .cTitle { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gd); font-weight: 700; }
+    .cBody { padding: 20px; }
+
+    /* ===== CHART CONTAINERS ===== */
+    .chart-wrap { position: relative; height: 280px; }
+    .chart-wrap-sm { position: relative; height: 100px; }
+
+    /* ===== TABLES ===== */
+    .tw { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { background: var(--g50); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--g600); }
+    tbody td { padding: 12px 14px; border-bottom: 1px solid var(--g100); }
+    tbody tr:hover { background: var(--g50); }
+
+    /* ===== BUTTONS ===== */
+    .btn { padding: 8px 14px; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .btnP { background: var(--g); color: white; }
+    .btnP:hover { background: var(--gd); }
+    .btnO { background: var(--g100); color: var(--g800); }
+    .btnO:hover { background: var(--g200); }
+    .btnD { background: var(--redl); color: var(--red); }
+    .btnD:hover { background: var(--red); color: white; }
+    .btnSm { padding: 6px 10px; font-size: 11px; }
+    .btnIco { padding: 6px 8px; }
+
+    /* ===== BADGES ===== */
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .bGreen { background: rgba(26,92,56,.15); color: var(--g); }
+    .bGold { background: rgba(201,168,76,.15); color: var(--amber); }
+    .bGray { background: var(--g100); color: var(--g600); }
+    .bBlue { background: var(--bluel); color: var(--blue); }
+
+    /* ===== TOAST ===== */
+    #toast { position: fixed; bottom: 20px; left: 20px; background: var(--g800); color: white; padding: 12px 16px; border-radius: 8px; font-size: 13px; z-index: 9999; opacity: 0; transform: translateY(20px); transition: all .3s; pointer-events: none; }
+    #toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty { text-align: center; padding: 40px 20px; color: var(--g500); }
+    .empty i { font-size: 48px; margin-bottom: 12px; opacity: .5; }
+    .empty p { font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+  <div class="lcard">
+    <div class="lemblem">
+      <i class="fas fa-graduation-cap"></i>
+    </div>
+    <div class="lschool">Saint Paul's R/C Basic School</div>
+    <div class="ltag">Management System</div>
+    <div class="ldiv"></div>
+    <div class="lerr" id="loginErr" role="alert">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="loginErrMsg"></span>
+    </div>
+    <div class="fg">
+      <label for="lu">Email Address</label>
+      <input type="email" id="lu" placeholder="admin@stpauls.edu.gh" autocomplete="email">
+    </div>
+    <div class="fg">
+      <label for="lp">Password</label>
+      <input type="password" id="lp" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btnLogin" id="loginBtn" onclick="handleLogin()" type="button">
+      <span id="loginBtnText">Sign In</span>
+      <div class="lspinner" id="loginSpinner"></div>
+    </button>
+    <p style="text-align: center; font-size: 12px; color: var(--g500); margin-top: 16px;">
+      Demo: admin@stpauls.edu.gh / admin123
+    </p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sb" id="sidebar">
+    <div class="sbH">
+      <div class="sbLogo">
+        <div class="sbLI">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="sbN">
+          <div class="sbNm">St. Paul's</div>
+          <div class="sbNs" id="termPill">Term 1 — 2024/2025</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sbNav" id="sbNav"></nav>
+    <div class="sbFt">
+      <div class="uChip">
+        <div class="uAv" id="uAv">A</div>
+        <div class="uDet">
+          <div class="uNm" id="uNm">Admin</div>
+          <div class="uRl" id="uRl">Admin</div>
+        </div>
+        <button class="btnLo" onclick="handleLogout()" aria-label="Logout" type="button">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sbOverlay" id="sbOverlay" onclick="closeSB()"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hbg" id="menuBtn" onclick="toggleSB()" aria-label="Toggle menu" aria-expanded="false" type="button">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="pgTitle" id="pgTitle">Dashboard</div>
+      <div class="addr">
+        Saint Paul's R/C Basic School<br>
+        Accra, Ghana
+      </div>
+    </div>
+
+    <main class="content">
+      <!-- DASHBOARD -->
+      <div class="sec active" id="sec-dashboard" role="region" aria-label="Dashboard">
+        <div class="secH">
+          <h2>Dashboard</h2>
+        </div>
+        <div class="sGrid" id="dashStats"></div>
+        <div class="card">
+          <div class="cHead">
+            <div class="cTitle">Recent Announcements</div>
+          </div>
+          <div class="cBody" id="dashAnn"></div>
+        </div>
+      </div>
+
+      <!-- STUDENTS -->
+      <div class="sec" id="sec-students" role="region" aria-label="Students">
+        <div class="secH">
+          <h2>Students</h2>
+          <button class="btn btnP" onclick="openStuModal()" type="button">
+            <i class="fas fa-plus"></i> Add Student
+          </button>
+        </div>
+        <div class="card">
+          <div class="cBody">
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Admission No.</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Parent</th>
+                    <th>Contact</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="stuTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF -->
+      <div class="sec" id="sec-staff" role="region" aria-label="Staff">
+        <div class="secH">
+          <h2>Staff</h2>
+          <button class="btn btnP" onclick="openStaffModal()" type="button">
+            <i class="fas fa-plus"></i> Add User
+          </button>
+        </div>
+        <div class="card">
+          <div class="cBody">
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th>EMIS Code</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Class</th>
+                    <th>Bank</th>
+                    <th>Contact</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="stTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="sec" id="sec-announcements" role="region" aria-label="Announcements">
+        <div class="secH">
+          <h2>Announcements</h2>
+          <button class="btn btnP" id="annAddBtn" onclick="openAnnModal()" type="button">
+            <i class="fas fa-plus"></i> New Announcement
+          </button>
+        </div>
+        <div id="annList"></div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="sec" id="sec-gallery" role="region" aria-label="School gallery">
+        <div class="secH">
+          <h2>School Gallery</h2>
+          <button class="btn btnP" id="galAddBtn" onclick="openGalModal()" type="button">
+            <i class="fas fa-camera"></i> Add Photo
+          </button>
+        </div>
+        <div id="galGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+  import {
+    doLoginWithFirebase,
+    doLogoutWithFirebase,
+    loadDBFromFirestore,
+    setupRealtimeListeners,
+    saveStuToFirestore,
+    delStuFromFirestore,
+    saveStaffToFirestore,
+    delStaffFromFirestore,
+    saveAnnToFirestore,
+    delAnnFromFirestore,
+    saveGalToFirestore,
+    delGalFromFirestore,
+    saveSettingsToFirestore,
+    migrateLocalStorageToFirestore,
+    currentUser,
+    db_local
+  } from './firebase-crud-operations.js';
+
+  // =============================================
+  // GLOBAL VARIABLES
+  // =============================================
+  const CLASSES = ['Primary 1', 'Primary 2', 'Primary 3', 'Primary 4', 'Primary 5', 'Primary 6'];
+  const CLASS_CAPACITY = 40;
+  const ATTENDANCE_DATA = {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+    data: [92, 88, 95, 90, 93]
+  };
+  let chartInstances = {};
+  let cu = null; // Current user
+  let tempGalImg = null;
+
+  const ADMIN_NAV = [
+    { id: 'dashboard', ic: 'fas fa-chart-line', lb: 'Dashboard' },
+    { id: 'students', ic: 'fas fa-user-graduate', lb: 'Students' },
+    { id: 'staff', ic: 'fas fa-users', lb: 'Staff' },
+    { id: 'announcements', ic: 'fas fa-bullhorn', lb: 'Announcements' },
+    { id: 'gallery', ic: 'fas fa-images', lb: 'Gallery' }
+  ];
+
+  const TEACHER_NAV = [
+    { id: 'dashboard', ic: 'fas fa-chart-line', lb: 'Dashboard' },
+    { id: 'students', ic: 'fas fa-user-graduate', lb: 'My Class' },
+    { id: 'announcements', ic: 'fas fa-bullhorn', lb: 'Announcements' },
+    { id: 'gallery', ic: 'fas fa-images', lb: 'Gallery' }
+  ];
+
+  // =============================================
+  // LOGIN HANDLER
+  // =============================================
+  async function handleLogin() {
+    const btn = document.getElementById('loginBtn');
+    const spinner = document.getElementById('loginSpinner');
+    const btnText = document.getElementById('loginBtnText');
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.style.display = 'none';
+
+    try {
+      await doLoginWithFirebase();
+      cu = currentUser;
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.style.display = 'inline';
+    }
+  }
+
+  // =============================================
+  // LOGOUT HANDLER
+  // =============================================
+  async function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+      await doLogoutWithFirebase();
+    }
+  }
+
+  // =============================================
+  // UTILITY FUNCTIONS
+  // =============================================
+  function toast(msg, type = 'info') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = type === 'warn' ? '#92400e' : 'var(--g800)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  function escHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function showLoginErr(msg) {
+    const e = document.getElementById('loginErr');
+    document.getElementById('loginErrMsg').textContent = msg;
+    e.style.display = 'flex';
+  }
+
+  function toggleSB() {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('sbOverlay');
+    const btn = document.getElementById('menuBtn');
+    const open = sb.classList.toggle('open');
+    ov.classList.toggle('show', open);
+    btn.setAttribute('aria-expanded', String(open));
+  }
+
+  function closeSB() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sbOverlay').classList.remove('show');
+    document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+  }
+
+  function updateTermPill() {
+    const pill = document.getElementById('termPill');
+    if (pill) pill.textContent = `${db_local.settings.term} — ${db_local.settings.year}`;
+  }
+
+  function navigate(sec, btn, title) {
+    document.querySelectorAll('.ni').forEach(n => {
+      n.classList.remove('active');
+      n.setAttribute('aria-current', 'false');
+    });
+    if (btn) { btn.classList.add('active'); btn.setAttribute('aria-current', 'page'); }
+
+    document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+    const secEl = document.getElementById('sec-' + sec);
+    if (secEl) secEl.classList.add('active');
+
+    document.getElementById('pgTitle').textContent = title;
+
+    const renderMap = {
+      dashboard: renderDash,
+      students: renderStudents,
+      staff: renderStaff,
+      announcements: renderAnn,
+      gallery: renderGal
+    };
+    if (renderMap[sec]) renderMap[sec]();
+
+    if (window.innerWidth <= 768) closeSB();
+  }
+
+  // =============================================
+  // RENDER FUNCTIONS
+  // =============================================
+  function renderDash() {
+    const isAdmin = cu.role === 'admin';
+    const statsEl = document.getElementById('dashStats');
+
+    if (isAdmin) {
+      statsEl.innerHTML = `
+        <div class="sCrd">
+          <div class="sIco iGreen"><i class="fas fa-user-graduate"></i></div>
+          <div><div class="sVal">${db_local.students.length}</div><div class="sLbl">Total Students</div></div>
+        </div>
+        <div class="sCrd">
+          <div class="sIco iGold"><i class="fas fa-users"></i></div>
+          <div><div class="sVal">${db_local.staff.length}</div><div class="sLbl">Total Users</div></div>
+        </div>
+        <div class="sCrd">
+          <div class="sIco iBlue"><i class="fas fa-images"></i></div>
+          <div><div class="sVal">${db_local.gallery.length}</div><div class="sLbl">Gallery Photos</div></div>
+        </div>
+        <div class="sCrd">
+          <div class="sIco iRed"><i class="fas fa-bullhorn"></i></div>
+          <div><div class="sVal">${db_local.announcements.length}</div><div class="sLbl">Announcements</div></div>
+        </div>`;
+    } else {
+      const myCls = cu.classAssigned;
+      const cnt = db_local.students.filter(s => s.cls === myCls).length;
+      statsEl.innerHTML = `
+        <div class="sCrd">
+          <div class="sIco iGreen"><i class="fas fa-user-graduate"></i></div>
+          <div><div class="sVal">${cnt}</div><div class="sLbl">My Class (${myCls || 'Unassigned'})</div></div>
+        </div>
+        <div class="sCrd">
+          <div class="sIco iRed"><i class="fas fa-bullhorn"></i></div>
+          <div><div class="sVal">${db_local.announcements.length}</div><div class="sLbl">Announcements</div></div>
+        </div>`;
+    }
+
+    const anns = db_local.announcements.slice(-3).reverse();
+    document.getElementById('dashAnn').innerHTML = anns.length
+      ? anns.map(a => `
+          <div style="padding:11px 0; border-bottom:1px solid var(--g100);">
+            <div style="font-weight:700; font-size:14px; color: var(--g800);">${escHtml(a.title)}</div>
+            <div style="font-size:11px; color:var(--g600); margin-top:2px;">${a.date || 'No date'}</div>
+          </div>`).join('')
+      : '<div class="empty"><p>No announcements yet</p></div>';
+  }
+
+  function renderStudents() {
+    const students = db_local.students;
+    document.getElementById('stuTbody').innerHTML = students.length
+      ? students.map(s => `
+          <tr>
+            <td><strong>${escHtml(s.adno)}</strong></td>
+            <td>${escHtml(s.name)}</td>
+            <td><span class="badge bGreen">${escHtml(s.cls)}</span></td>
+            <td>${escHtml(s.parent) || '—'}</td>
+            <td>${escHtml(s.phone) || '—'}</td>
+            <td style="display:flex; gap:6px;">
+              <button class="btn btnSm btnO" onclick="openStuModal('${s.id}')" type="button">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btnSm btnD" onclick="delStu('${s.id}')" type="button">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>`).join('')
+      : '<tr><td colspan="6" style="text-align:center; padding:20px;">No students found</td></tr>';
+  }
+
+  function renderStaff() {
+    const staff = db_local.staff;
+    document.getElementById('stTbody').innerHTML = staff.length
+      ? staff.map(s => `
+          <tr>
+            <td><span class="badge bGray">${escHtml(s.emis) || '—'}</span></td>
+            <td><strong>${escHtml(s.name)}</strong></td>
+            <td><span class="badge ${s.role === 'admin' ? 'bGold' : 'bGreen'}">${s.role.toUpperCase()}</span></td>
+            <td>${escHtml(s.classAssigned) || '—'}</td>
+            <td>${escHtml(s.bankName) || '—'}</td>
+            <td>${escHtml(s.contact) || '—'}</td>
+            <td style="display:flex; gap:6px;">
+              <button class="btn btnSm btnO" onclick="openStaffModal('${s.id}')" type="button">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btnSm btnD" onclick="delSt('${s.id}')" type="button">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>`).join('')
+      : '<tr><td colspan="7" style="text-align:center; padding:20px;">No staff found</td></tr>';
+  }
+
+  function renderAnn() {
+    const anns = db_local.announcements;
+    document.getElementById('annList').innerHTML = anns.length
+      ? anns.slice().reverse().map(a => `
+          <div class="card">
+            <div class="cHead">
+              <div class="cTitle">${escHtml(a.title)}</div>
+              <div style="font-size:12px; color:var(--g600);">${a.date || ''}</div>
+            </div>
+            <div class="cBody">
+              <p style="font-size:14px; line-height:1.7; color:var(--g700);">${escHtml(a.message)}</p>
+              ${cu.role === 'admin' ? `<button class="btn btnSm btnD" onclick="delAnn('${a.id}')" type="button">
+                <i class="fas fa-trash"></i> Delete
+              </button>` : ''}
+            </div>
+          </div>`).join('')
+      : '<div class="empty"><i class="fas fa-bullhorn"></i><p>No announcements yet</p></div>';
+  }
+
+  function renderGal() {
+    const gal = db_local.gallery;
+    document.getElementById('galGrid').innerHTML = gal.length
+      ? gal.slice().reverse().map(g => `
+          <div style="background:white; border-radius:var(--r); overflow:hidden; box-shadow:var(--shs); border:1px solid var(--g100);">
+            <img src="${g.src}" alt="${escHtml(g.title)}" style="width:100%; height:150px; object-fit:cover;">
+            <div style="padding:12px;">
+              <div style="font-weight:700; font-size:13px; color:var(--g800);">${escHtml(g.title)}</div>
+              <div style="font-size:11px; color:var(--g600); margin-top:4px;">${escHtml(g.cat) || 'General'}</div>
+              ${cu.role === 'admin' ? `<button class="btn btnSm btnD" style="margin-top:10px; width:100%;" onclick="delGal('${g.id}')" type="button">
+                <i class="fas fa-trash"></i> Remove
+              </button>` : ''}
+            </div>
+          </div>`).join('')
+      : '<div class="empty" style="grid-column:1/-1;"><i class="fas fa-images"></i><p>No photos yet</p></div>';
+  }
+
+  // =============================================
+  // MODAL FUNCTIONS
+  // =============================================
+  function openStuModal(id) {
+    if (id) {
+      const s = db_local.students.find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('sAdno').value = s.adno || '';
+      document.getElementById('sName').value = s.name || '';
+      document.getElementById('sCls').value = s.cls || '';
+      document.getElementById('sNhis').value = s.nhis || '';
+      document.getElementById('sParent').value = s.parent || '';
+      document.getElementById('sPhone').value = s.phone || '';
+    } else {
+      document.getElementById('sAdno').value = '';
+      document.getElementById('sName').value = '';
+      document.getElementById('sCls').value = '';
+      document.getElementById('sNhis').value = '';
+      document.getElementById('sParent').value = '';
+      document.getElementById('sPhone').value = '';
+    }
+    alert('Modal functionality requires full HTML implementation with modals');
+  }
+
+  function openStaffModal(id) {
+    alert('Modal functionality requires full HTML implementation with modals');
+  }
+
+  function openAnnModal() {
+    alert('Modal functionality requires full HTML implementation with modals');
+  }
+
+  function openGalModal() {
+    alert('Modal functionality requires full HTML implementation with modals');
+  }
+
+  // =============================================
+  // DELETE FUNCTIONS
+  // =============================================
+  async function delStu(id) {
+    if (confirm('Delete this student?')) {
+      await delStuFromFirestore(id);
+      renderStudents();
+    }
+  }
+
+  async function delSt(id) {
+    if (confirm('Delete this staff member?')) {
+      await delStaffFromFirestore(id);
+      renderStaff();
+    }
+  }
+
+  async function delAnn(id) {
+    if (confirm('Delete this announcement?')) {
+      await delAnnFromFirestore(id);
+      renderAnn();
+    }
+  }
+
+  async function delGal(id) {
+    if (confirm('Remove this photo?')) {
+      await delGalFromFirestore(id);
+      renderGal();
+    }
+  }
+
+  // =============================================
+  // APP INITIALIZATION
+  // =============================================
+  function initApp() {
+    const isAdmin = cu.role === 'admin';
+
+    // User chip
+    document.getElementById('uAv').textContent = cu.name.charAt(0).toUpperCase();
+    document.getElementById('uNm').textContent = cu.name;
+    document.getElementById('uRl').textContent = cu.role.charAt(0).toUpperCase() + cu.role.slice(1);
+
+    // Build nav
+    const nav = isAdmin ? ADMIN_NAV : TEACHER_NAV;
+    const navEl = document.getElementById('sbNav');
+    navEl.innerHTML = '';
+    nav.forEach((item, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'ni' + (i === 0 ? ' active' : '');
+      btn.innerHTML = `<i class="${item.ic}"></i>${item.lb}`;
+      btn.onclick = () => navigate(item.id, btn, item.lb);
+      navEl.appendChild(btn);
+    });
+
+    // Show/hide role-gated elements
+    ['annAddBtn', 'galAddBtn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = isAdmin ? '' : 'none';
+    });
+
+    updateTermPill();
+    navigate('dashboard', navEl.firstChild, 'Dashboard');
+  }
+
+  // Allow Enter key to submit login
+  document.getElementById('lp').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  document.getElementById('lu').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  // Make functions globally accessible
+  window.handleLogin = handleLogin;
+  window.handleLogout = handleLogout;
+  window.navigate = navigate;
+  window.openStuModal = openStuModal;
+  window.openStaffModal = openStaffModal;
+  window.openAnnModal = openAnnModal;
+  window.openGalModal = openGalModal;
+  window.delStu = delStu;
+  window.delSt = delSt;
+  window.delAnn = delAnn;
+  window.delGal = delGal;
+  window.toggleSB = toggleSB;
+  window.closeSB = closeSB;
+  window.toast = toast;
+  window.renderStudents = renderStudents;
+  window.renderStaff = renderStaff;
+  window.renderAnn = renderAnn;
+  window.renderGal = renderGal;
+  window.renderDash = renderDash;
+</script>
+
+</body>
+</html>
