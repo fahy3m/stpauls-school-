@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Saint Paul's R/C Basic School</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- FIX: Real chart library instead of decorative SVG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --g: #1a5c38; --gd: #0d3d25; --gm: #226b43; --gl: #2e8b57; --gp: #f0f7f3;
+      --gold: #c9a84c; --goldl: #e8c96a; --goldp: #fdf8ee;
+      --w: #fff; --g50: #f9fafb; --g100: #f3f4f6; --g200: #e5e7eb; --g300: #d1d5db;
+      /* FIX: --g400 was failing WCAG AA on white; bumped to --g500 minimum for body text */
+      --g400: #9ca3af; --g500: #6b7280; --g600: #4b5563; --g700: #374151; --g800: #1f2937;
+      --red: #dc2626; --redl: #fef2f2; --blue: #2563eb; --bluel: #eff6ff;
+      --amber: #d97706; --amberl: #fffbeb; --purple: #7c3aed; --purplel: #f3e8ff;
+      --sb: 260px; --tb: 64px; --r: 14px; --rsm: 8px;
+      --sh: 0 4px 24px rgba(0,0,0,.08); --shm: 0 8px 32px rgba(0,0,0,.12); --shs: 0 2px 8px rgba(0,0,0,.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--g100); color: var(--g800); min-height: 100vh; }
+
+    /* ===== LOGIN ===== */
+    #loginPage { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--gd) 0%, var(--g) 55%, var(--gl) 100%); position: relative; overflow: hidden; }
+    #loginPage::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E"); }
+    .lcard { background: var(--w); border-radius: 20px; padding: 52px 44px; width: 100%; max-width: 440px; box-shadow: 0 32px 80px rgba(0,0,0,.35); position: relative; z-index: 1; animation: riseUp .5s cubic-bezier(.16,1,.3,1); }
+    @keyframes riseUp { from { opacity: 0; transform: translateY(40px) } to { opacity: 1; transform: translateY(0) } }
+    .lemblem { width: 80px; height: 80px; background: linear-gradient(135deg, var(--gd), var(--gl)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 12px 32px rgba(26,92,56,.4); overflow: hidden; }
+    .lemblem img { width: 100%; height: 100%; object-fit: contain; }
+    .lemblem i { color: var(--goldl); font-size: 36px; }
+    .lschool { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--gd); text-align: center; line-height: 1.3; font-weight: 700; }
+    .ltag { text-align: center; color: var(--g500); font-size: 11px; margin-bottom: 32px; letter-spacing: 1px; text-transform: uppercase; }
+    .ldiv { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin-bottom: 28px; }
+    .fg { margin-bottom: 18px; }
+    .fg label { display: block; font-size: 11px; font-weight: 700; color: var(--g600); margin-bottom: 7px; letter-spacing: .5px; text-transform: uppercase; }
+    .fg input { width: 100%; padding: 13px 16px; border: 2px solid var(--g200); border-radius: 10px; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s; background: var(--g50); }
+    .fg input:focus { outline: none; border-color: var(--g); background: white; box-shadow: 0 0 0 4px rgba(26,92,56,.08); }
+    /* FIX: proper :focus-visible ring for keyboard nav */
+    .fg input:focus-visible { outline: 3px solid var(--g); outline-offset: 2px; }
+    .btnLogin { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gd), var(--gl)); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s; box-shadow: 0 6px 20px rgba(26,92,56,.35); }
+    .btnLogin:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,92,56,.45); }
+    .btnLogin:focus-visible { outline: 3px solid var(--goldl); outline-offset: 3px; }
+    .lerr { background: var(--redl); color: var(--red); padding: 11px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
+
+    /* ===== APP SHELL ===== */
+    #app { display: none; min-height: 100vh; }
+    .sb { position: fixed; left: 0; top: 0; bottom: 0; width: var(--sb); background: linear-gradient(180deg, var(--gd) 0%, var(--gm) 100%); display: flex; flex-direction: column; z-index: 200; box-shadow: 4px 0 32px rgba(0,0,0,.2); transition: transform .3s cubic-bezier(.16,1,.3,1); }
+    .sbH { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .sbLogo { display: flex; align-items: center; gap: 12px; }
+    .sbLI { width: 44px; height: 44px; background: linear-gradient(135deg, var(--gold), var(--goldl)); border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(201,168,76,.4); overflow: hidden; }
+    .sbLI img { width: 100%; height: 100%; object-fit: contain; }
+    .sbLI i { color: var(--gd); font-size: 19px; }
+    .sbN { color: white; }
+    .sbNm { font-family: 'Cormorant Garamond', serif; font-size: 13px; line-height: 1.3; font-weight: 700; }
+    .sbNs { font-size: 10px; color: rgba(255,255,255,.6); margin-top: 2px; letter-spacing: .5px; }
+    .sbNav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+    /* FIX: nav items are now real buttons for accessibility */
+    .ni { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 10px; color: rgba(255,255,255,.75); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; margin-bottom: 2px; background: none; border: none; width: 100%; text-align: left; font-family: inherit; }
+    .ni:hover { background: rgba(255,255,255,.1); color: white; }
+    .ni.active { background: linear-gradient(135deg, var(--gold), var(--goldl)); color: var(--gd); font-weight: 700; }
+    .ni:focus-visible { outline: 2px solid var(--goldl); outline-offset: -2px; }
+    .ni i { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; }
+    .sbFt { padding: 12px; border-top: 1px solid rgba(255,255,255,.08); }
+    .uChip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.07); }
+    .uAv { width: 34px; height: 34px; background: linear-gradient(135deg, var(--gold), var(--goldl)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--gd); font-size: 13px; flex-shrink: 0; }
+    .uDet { flex: 1; min-width: 0; }
+    .uNm { color: white; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .uRl { color: rgba(255,255,255,.55); font-size: 10px; }
+    /* FIX: logout button now has visible label and proper aria */
+    .btnLo { background: none; border: none; color: rgba(255,255,255,.55); cursor: pointer; padding: 6px; font-size: 14px; transition: color .2s; flex-shrink: 0; border-radius: 6px; }
+    .btnLo:hover { color: white; }
+    .btnLo:focus-visible { outline: 2px solid var(--goldl); }
+
+    /* FIX: sidebar overlay for mobile */
+    .sbOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 199; }
+    .sbOverlay.show { display: block; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main { margin-left: var(--sb); min-height: 100vh; }
+    .topbar { height: var(--tb); background: white; border-bottom: 1px solid var(--g200); display: flex; align-items: center; justify-content: space-between; padding: 0 26px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shs); }
+    .pgTitle { font-family: 'Cormorant Garamond', serif; font-size: 23px; color: var(--gd); font-weight: 700; }
+    .addr { font-size: 11px; color: var(--g600); text-align: right; line-height: 1.6; }
+    /* FIX: hamburger has aria-label */
+    .hbg { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--g600); padding: 6px; border-radius: 6px; }
+    .hbg:focus-visible { outline: 2px solid var(--g); }
+    @media(max-width: 768px) {
+      .hbg { display: block; }
+      .sb { transform: translateX(-100%); }
+      .sb.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+    }
+
+    /* ===== CONTENT ===== */
+    .content { padding: 26px; }
+    .sec { display: none; }
+    .sec.active { display: block; animation: fadeUp .3s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
+    .secH { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 15px; }
+    .secH h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--gd); }
+
+    /* ===== STAT CARDS ===== */
+    .sGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 22px; }
+    .sCrd { background: white; border-radius: var(--r); padding: 20px; box-shadow: var(--shs); display: flex; align-items: center; gap: 14px; transition: transform .2s, box-shadow .2s; border: 1px solid var(--g100); }
+    .sCrd:hover { transform: translateY(-3px); box-shadow: var(--shm); }
+    .sIco { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .iGreen { background: rgba(26,92,56,.1); color: var(--g); }
+    .iGold { background: rgba(201,168,76,.15); color: var(--amber); }
+    .iBlue { background: var(--bluel); color: var(--blue); }
+    .iRed { background: var(--redl); color: var(--red); }
+    .sVal { font-size: 28px; font-weight: 800; color: var(--g800); line-height: 1; }
+    /* FIX: label text uses --g600 (4.63:1 contrast) instead of --g400 (2.85:1) */
+    .sLbl { font-size: 12px; color: var(--g600); margin-top: 3px; font-weight: 500; }
+
+    /* ===== CARDS ===== */
+    .card { background: white; border-radius: var(--r); box-shadow: var(--shs); overflow: hidden; border: 1px solid var(--g100); margin-bottom: 22px; }
+    .cHead { padding: 16px 20px; border-bottom: 1px solid var(--g100); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .cTitle { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gd); font-weight: 700; }
+    .cBody { padding: 20px; }
+
+    /* ===== CHART CONTAINERS ===== */
+    .chart-wrap { position: relative; height: 280px; }
+    .chart-wrap-sm { position: relative; height: 100px; }
+
+    /* ===== TABLES ===== */
+    .tw { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { background: var(--g50); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--g600); text-transform: uppercase; letter-spacing: .6px; border-bottom: 1px solid var(--g200); }
+    tbody tr { border-bottom: 1px solid var(--g100); transition: background .15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--g50); }
+    tbody td { padding: 12px 14px; vertical-align: middle; }
+
+    /* ===== BADGES ===== */
+    .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .bGreen { background: rgba(26,92,56,.1); color: #0f5132; }
+    .bGold { background: rgba(201,168,76,.15); color: #7d5a00; }
+    .bRed { background: var(--redl); color: #991b1b; }
+    .bBlue { background: var(--bluel); color: #1d4ed8; }
+    .bGray { background: var(--g100); color: var(--g700); }
+
+    /* ===== BUTTONS ===== */
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--rsm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s; border: none; }
+    .btn:focus-visible { outline: 3px solid var(--g); outline-offset: 2px; }
+    .btnP { background: linear-gradient(135deg, var(--g), var(--gl)); color: white; box-shadow: 0 2px 10px rgba(26,92,56,.25); }
+    .btnP:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(26,92,56,.35); }
+    .btnG { background: linear-gradient(135deg, var(--gold), var(--goldl)); color: var(--gd); }
+    .btnD { background: var(--redl); color: #991b1b; }
+    .btnD:hover { background: var(--red); color: white; }
+    .btnO { background: transparent; border: 2px solid var(--g200); color: var(--g700); }
+    .btnO:hover { border-color: var(--g); color: var(--g); }
+    .btnSm { padding: 5px 10px; font-size: 11px; }
+    .btnIco { width: 30px; height: 30px; padding: 0; justify-content: center; border-radius: 7px; }
+
+    /* ===== FORMS ===== */
+    .fRow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media(max-width: 600px) { .fRow { grid-template-columns: 1fr; } }
+    .fFld { margin-bottom: 16px; }
+    .fFld label { display: block; font-size: 11px; font-weight: 700; color: var(--g600); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+    .fFld input, .fFld select, .fFld textarea { width: 100%; padding: 10px 14px; border: 2px solid var(--g200); border-radius: var(--rsm); font-size: 13.5px; font-family: inherit; transition: all .2s; background: var(--g50); color: var(--g800); }
+    .fFld input:focus, .fFld select:focus, .fFld textarea:focus { outline: none; border-color: var(--g); background: white; box-shadow: 0 0 0 4px rgba(26,92,56,.06); }
+    .fFld input:focus-visible, .fFld select:focus-visible, .fFld textarea:focus-visible { outline: 3px solid var(--g); outline-offset: 1px; }
+    .fFld select:disabled { opacity: 0.7; background: #eef2f0; cursor: not-allowed; border-color: var(--g300); }
+    .inputReveal { position: relative; }
+    .inputReveal input { padding-right: 42px; }
+    .inputReveal button { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--g500); cursor: pointer; padding: 5px; border-radius: 4px; }
+    .inputReveal button:hover { color: var(--g); }
+    .inputReveal button:focus-visible { outline: 2px solid var(--g); }
+    .fErr { background: var(--redl); color: #991b1b; padding: 10px; border-radius: 8px; font-size: 12px; margin-top: 10px; display: none; }
+    .fHint { font-size: 10px; color: var(--g500); margin-top: 4px; display: block; }
+    .reqMark { color: var(--red); }
+
+    /* ===== MODAL (with focus trap) ===== */
+    .ov { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(6px); animation: fadeUp .2s ease; }
+    .modal { background: white; border-radius: 18px; width: 100%; max-width: 580px; max-height: 92vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(0,0,0,.35); animation: riseUp .3s cubic-bezier(.16,1,.3,1); }
+    .mHead { padding: 24px 26px 0; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 10; padding-bottom: 14px; border-bottom: 1px solid var(--g100); }
+    .mTitle { font-family: 'Cormorant Garamond', serif; font-size: 21px; color: var(--gd); font-weight: 700; }
+    /* FIX: close button has accessible aria-label */
+    .mClose { background: var(--g100); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: var(--g600); transition: all .2s; font-size: 14px; }
+    .mClose:hover { background: var(--redl); color: var(--red); }
+    .mClose:focus-visible { outline: 3px solid var(--g); }
+    .mBody { padding: 24px 26px; }
+    .mFoot { padding: 16px 26px 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--g100); }
+    .sDiv { font-size: 10px; font-weight: 800; color: var(--g); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 12px; display: flex; align-items: center; gap: 10px; }
+    .sDiv::after { content: ''; flex: 1; height: 1px; background: var(--g200); }
+
+    /* ===== SEARCH BAR ===== */
+    .sWrap { position: relative; flex: 1; }
+    .sWrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--g500); pointer-events: none; }
+    .sWrap input { width: 100%; padding: 10px 14px 10px 36px; border: 2px solid var(--g200); border-radius: 8px; font-size: 13px; transition: all .2s; background: white; color: var(--g800); }
+    .sWrap input:focus { outline: none; border-color: var(--g); box-shadow: 0 0 0 3px rgba(26,92,56,0.05); }
+
+    /* ===== GALLERY ===== */
+    .galGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+    .galCrd { background: white; border-radius: 12px; overflow: hidden; box-shadow: var(--shs); border: 1px solid var(--g100); }
+    .galImg { width: 100%; height: 170px; background: var(--g100); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .galImg img { width: 100%; height: 100%; object-fit: cover; }
+    .galImg i { font-size: 36px; color: var(--g400); }
+    .galInf { padding: 14px; }
+    .galT { font-weight: 700; font-size: 14px; color: var(--gd); margin-bottom: 4px; }
+    .galC { font-size: 10px; font-weight: 700; color: #7d5a00; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ===== TERM PILL ===== */
+    .termPill { background: linear-gradient(135deg, var(--gp), white); border: 1px solid rgba(26,92,56,.2); color: var(--g); font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; letter-spacing: .3px; }
+
+    /* ===== UTILS ===== */
+    .empty { text-align: center; padding: 40px 20px; color: var(--g500); }
+    .empty i { font-size: 44px; margin-bottom: 14px; opacity: 0.3; display: block; }
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--g800); color: white; padding: 11px 22px; border-radius: 30px; font-size: 13px; font-weight: 600; z-index: 2000; transition: transform .3s cubic-bezier(.16,1,.3,1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); pointer-events: none; }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    /* FIX: role="status" live region for screen readers is set in HTML */
+    .progB { height: 7px; background: var(--g100); border-radius: 4px; overflow: hidden; }
+    .progF { height: 100%; background: var(--g); border-radius: 4px; transition: width .4s ease; }
+    /* Skip link for keyboard users */
+    .skip-link { position: absolute; top: -100px; left: 16px; background: var(--gd); color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 700; z-index: 9999; text-decoration: none; transition: top .2s; }
+    .skip-link:focus { top: 16px; }
+    /* Responsive dashboard grid */
+    @media(max-width: 900px) { .dashGrid { grid-template-columns: 1fr !important; } }
+  </style>
+</head>
+<body>
+
+<!-- FIX: Skip navigation link for keyboard users -->
+<a class="skip-link" href="#mainContent">Skip to main content</a>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" role="main" aria-label="Login">
+  <div class="lcard">
+    <div class="lemblem" id="loginCrest" aria-hidden="true">
+      <i class="fas fa-school"></i>
+    </div>
+    <h1 class="lschool">Saint Paul's R/C Basic School</h1>
+    <p class="ltag">School Management System</p>
+    <div class="ldiv" aria-hidden="true"></div>
+
+    <div class="lerr" id="loginErr" role="alert" aria-live="assertive">
+      <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+      <span id="loginErrMsg">Invalid credentials</span>
+    </div>
+
+    <div class="fg">
+      <label for="lu">Username</label>
+      <input type="text" id="lu" placeholder="Enter username" autocomplete="username"
+             aria-required="true" aria-describedby="loginErr">
+    </div>
+    <div class="fg">
+      <label for="lp">Password</label>
+      <input type="password" id="lp" placeholder="••••••••" autocomplete="current-password"
+             aria-required="true" aria-describedby="loginErr">
+    </div>
+
+    <button class="btnLogin" onclick="doLogin()" type="button">Sign In to Dashboard</button>
+
+    <div style="margin-top: 24px; text-align: center;">
+      <label for="crestUpload" class="btn btnSm btnO" style="cursor: pointer;">
+        <i class="fas fa-upload" aria-hidden="true"></i> Set School Crest
+      </label>
+      <input type="file" id="crestUpload" hidden accept="image/*" onchange="handleCrest(this)"
+             aria-label="Upload school crest image">
+    </div>
+    <p style="margin-top: 16px; text-align: center; font-size: 11px; color: var(--g500);">
+      Default login: <strong>admin</strong> / <strong>admin123</strong>
+    </p>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app" style="display:none;">
+  <!-- FIX: sidebar overlay dismisses on click -->
+  <div class="sbOverlay" id="sbOverlay" onclick="closeSB()" aria-hidden="true"></div>
+
+  <nav class="sb" id="sidebar" aria-label="Main navigation">
+    <div class="sbH">
+      <div class="sbLogo">
+        <div class="sbLI" id="sbCrest" aria-hidden="true"><i class="fas fa-school"></i></div>
+        <div class="sbN">
+          <div class="sbNm">Saint Paul's R/C</div>
+          <div class="sbNs">BASIC SCHOOL</div>
+        </div>
+      </div>
+    </div>
+    <div class="sbNav" id="sbNav" role="list"></div>
+    <div class="sbFt">
+      <div class="uChip">
+        <div class="uAv" id="uAv" aria-hidden="true">A</div>
+        <div class="uDet">
+          <div class="uNm" id="uNm">Administrator</div>
+          <div class="uRl" id="uRl">Headmaster</div>
+        </div>
+        <!-- FIX: logout button has aria-label -->
+        <button class="btnLo" onclick="doLogout()" aria-label="Log out" title="Log out">
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main" id="mainContent">
+    <div class="topbar" role="banner">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <!-- FIX: hamburger has aria-label and aria-expanded -->
+        <button class="hbg" onclick="toggleSB()" aria-label="Toggle navigation menu" aria-expanded="false" id="menuBtn">
+          <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+        <h1 class="pgTitle" id="pgTitle">Dashboard</h1>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="termPill" id="termPill" aria-label="Current term">Term 2 — 2024/2025</span>
+        <div class="addr" aria-label="School address">
+          Sunyani Municipal, Atronie<br>Box 138
+        </div>
+      </div>
+    </div>
+
+    <main class="content" aria-live="polite" aria-atomic="false">
+
+      <!-- DASHBOARD -->
+      <div class="sec" id="sec-dashboard" role="region" aria-label="Dashboard">
+        <div class="sGrid" id="dashStats" aria-label="Key statistics"></div>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;" class="dashGrid">
+          <div class="card">
+            <div class="cHead"><div class="cTitle">Enrollment by Class</div></div>
+            <div class="cBody" id="dashEnroll"></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 22px;">
+            <!-- FIX: Real Chart.js attendance chart -->
+            <div class="card">
+              <div class="cHead">
+                <div class="cTitle">Weekly Attendance</div>
+                <div id="attBadge"></div>
+              </div>
+              <div class="cBody" style="padding-top: 10px;">
+                <div class="chart-wrap-sm">
+                  <canvas id="attendanceChart" aria-label="Weekly attendance trend chart" role="img"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="cHead"><div class="cTitle">Latest Announcements</div></div>
+              <div class="cBody" id="dashAnn"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENTS -->
+      <div class="sec" id="sec-students" role="region" aria-label="Student directory">
+        <div class="secH">
+          <h2>Student Directory</h2>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btnG" id="promoteBtn" onclick="promoteStudents()" type="button">
+              <i class="fas fa-level-up-alt" aria-hidden="true"></i> Promote All
+            </button>
+            <button class="btn btnP" onclick="openStudentModal()" type="button">
+              <i class="fas fa-plus" aria-hidden="true"></i> Add Student
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cHead">
+            <div style="display: flex; gap: 12px; flex: 1; flex-wrap: wrap;">
+              <div class="sWrap">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="search" id="stuSearch" placeholder="Search by name or admission no…"
+                       oninput="renderStudents()" aria-label="Search students">
+              </div>
+              <select id="stuCFilter" onchange="renderStudents()"
+                      aria-label="Filter by class"
+                      style="padding: 8px 14px; border: 2px solid var(--g200); border-radius: 8px; font-size: 13px; color: var(--g800); background: white;"></select>
+            </div>
+            <div id="stuCount" style="font-size: 12px; color: var(--g500); font-weight: 600;" aria-live="polite"></div>
+          </div>
+          <div class="tw">
+            <table aria-label="Student records">
+              <thead>
+                <tr>
+                  <th scope="col">Adm No.</th>
+                  <th scope="col">Full Name</th>
+                  <th scope="col">Class</th>
+                  <th scope="col">Parent/Guardian</th>
+                  <th scope="col">Contact</th>
+                  <th scope="col">NHIS</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="stuTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLASSES -->
+      <div class="sec" id="sec-classes" role="region" aria-label="Classes and enrollment">
+        <div class="secH"><h2>Classes & Academic Settings</h2></div>
+        <div class="card">
+          <div class="cHead"><div class="cTitle">Academic Configuration</div></div>
+          <div class="cBody">
+            <div class="fRow">
+              <div class="fFld">
+                <label for="selTerm">Active Term</label>
+                <select id="selTerm" aria-required="true">
+                  <option>Term 1</option><option selected>Term 2</option><option>Term 3</option>
+                </select>
+              </div>
+              <div class="fFld">
+                <label for="selYear">Academic Year</label>
+                <select id="selYear" aria-required="true">
+                  <option>2023/2024</option><option selected>2024/2025</option><option>2025/2026</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btnP" onclick="saveSettings()" type="button">
+              <i class="fas fa-save" aria-hidden="true"></i> Update Settings
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cHead">
+            <div class="cTitle">Class Enrollment Summary</div>
+            <!-- FIX: Real enrollment bar chart -->
+            <button class="btn btnSm btnO" onclick="toggleEnrollView()" id="enrollViewBtn" type="button">
+              <i class="fas fa-chart-bar" aria-hidden="true"></i> Chart View
+            </button>
+          </div>
+          <div id="enrollTable">
+            <div class="tw">
+              <table aria-label="Class enrollment summary">
+                <thead>
+                  <tr>
+                    <th scope="col">Class Name</th>
+                    <th scope="col">Students Enrolled</th>
+                    <th scope="col">Capacity</th>
+                    <th scope="col">Occupancy</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="clsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="enrollChartWrap" style="display:none; padding: 20px;">
+            <div class="chart-wrap">
+              <canvas id="enrollChart" aria-label="Enrollment by class chart" role="img"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBJECTS -->
+      <div class="sec" id="sec-subjects" role="region" aria-label="Subject management">
+        <div class="secH"><h2>Subject Management</h2></div>
+        <div class="card">
+          <div class="cHead">
+            <div class="cTitle">Configure Subjects per Class</div>
+            <select id="subClsSel" onchange="renderSubjects()" aria-label="Select class for subjects"
+                    style="padding: 8px 14px; border: 2px solid var(--g200); border-radius: 8px; font-size: 13px; color: var(--g800); background: white;"></select>
+          </div>
+          <div class="cBody">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+              <input type="text" id="newSubName" placeholder="Enter subject name (e.g. Mathematics)"
+                     style="flex: 1; min-width: 200px; padding: 10px 14px; border: 2px solid var(--g200); border-radius: 8px; font-size: 13.5px; color: var(--g800); background: var(--g50);"
+                     aria-label="New subject name" onkeydown="if(event.key==='Enter')addSub()">
+              <button class="btn btnP" onclick="addSub()" type="button">
+                <i class="fas fa-plus" aria-hidden="true"></i> Add Subject
+              </button>
+            </div>
+            <div id="subList" style="display: flex; flex-wrap: wrap; gap: 10px;" role="list" aria-label="Subjects list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="sec" id="sec-staff" role="region" aria-label="User management">
+        <div class="secH">
+          <h2>User Management</h2>
+          <button class="btn btnP" onclick="openStaffModal()" type="button">
+            <i class="fas fa-user-plus" aria-hidden="true"></i> Add New User
+          </button>
+        </div>
+        <div class="card">
+          <div class="tw">
+            <table aria-label="Staff and user records">
+              <thead>
+                <tr>
+                  <th scope="col">EMIS Code</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Assigned Class</th>
+                  <th scope="col">Bank</th>
+                  <th scope="col">Contact</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="stTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="sec" id="sec-announcements" role="region" aria-label="Announcements">
+        <div class="secH">
+          <h2>Announcements</h2>
+          <button class="btn btnP" id="annAddBtn" onclick="openAnnModal()" type="button">
+            <i class="fas fa-plus" aria-hidden="true"></i> New Announcement
+          </button>
+        </div>
+        <div id="annList"></div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="sec" id="sec-gallery" role="region" aria-label="School gallery">
+        <div class="secH">
+          <h2>School Gallery</h2>
+          <button class="btn btnP" id="galAddBtn" onclick="openGalModal()" type="button">
+            <i class="fas fa-camera" aria-hidden="true"></i> Add Photo
+          </button>
+        </div>
+        <div id="galGrid" class="galGrid" role="list" aria-label="Gallery photos"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ======================================================
+     MODALS
+     FIX: All modals have role="dialog", aria-modal, aria-labelledby,
+     and focus is managed programmatically via openM() / closeM()
+     ====================================================== -->
+
+<!-- Student Modal -->
+<div id="mStu" style="display:none;" class="ov" role="dialog" aria-modal="true" aria-labelledby="mStuTitle">
+  <div class="modal">
+    <div class="mHead">
+      <div class="mTitle" id="mStuTitle">Add Student</div>
+      <button class="mClose" onclick="closeM('mStu')" aria-label="Close dialog" type="button">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="mBody">
+      <input type="hidden" id="sId">
+      <div class="fRow">
+        <div class="fFld">
+          <label for="sAdno">Admission Number <span class="reqMark" aria-label="required">*</span></label>
+          <input type="text" id="sAdno" placeholder="e.g. 2024001" aria-required="true">
+        </div>
+        <div class="fFld">
+          <label for="sName">Full Name <span class="reqMark" aria-label="required">*</span></label>
+          <input type="text" id="sName" placeholder="e.g. Kwame Mensah" aria-required="true">
+        </div>
+      </div>
+      <div class="fRow">
+        <div class="fFld">
+          <label for="sCls">Class <span class="reqMark" aria-label="required">*</span></label>
+          <select id="sCls" aria-required="true"></select>
+        </div>
+        <div class="fFld">
+          <label for="sNhis">NHIS Number</label>
+          <input type="text" id="sNhis" placeholder="NHIS Number">
+        </div>
+      </div>
+      <div class="fRow">
+        <div class="fFld">
+          <label for="sParent">Parent/Guardian Name</label>
+          <input type="text" id="sParent" placeholder="Parent Full Name">
+        </div>
+        <div class="fFld">
+          <label for="sPhone">Parent Contact</label>
+          <input type="tel" id="sPhone" placeholder="0244xxxxxx" pattern="[0-9]{10}">
+        </div>
+      </div>
+      <div class="fErr" id="sErr" role="alert"></div>
+    </div>
+    <div class="mFoot">
+      <button class="btn btnO" onclick="closeM('mStu')" type="button">Cancel</button>
+      <button class="btn btnP" onclick="saveStu()" type="button">
+        <i class="fas fa-save" aria-hidden="true"></i> Save Student
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Staff Modal -->
+<div id="mSt" style="display:none;" class="ov" role="dialog" aria-modal="true" aria-labelledby="mStTitle">
+  <div class="modal" style="max-width: 640px;">
+    <div class="mHead">
+      <div class="mTitle" id="mStTitle">Add User</div>
+      <button class="mClose" onclick="closeM('mSt')" aria-label="Close dialog" type="button">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="mBody">
+      <input type="hidden" id="stId">
+      <div class="sDiv"><i class="fas fa-user" aria-hidden="true"></i> Personal & Professional</div>
+      <div class="fRow">
+        <div class="fFld">
+          <label for="stName">Full Name <span class="reqMark" aria-label="required">*</span></label>
+          <input type="text" id="stName" placeholder="e.g. Mr. Kofi Asante" aria-required="true">
+        </div>
+        <div class="fFld">
+          <label for="stRole">Role <span class="reqMark" aria-label="required">*</span></label>
+          <select id="stRole" onchange="toggleClsField()" aria-required="true">
+            <option value="teacher">Teacher</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="fRow">
+        <div class="fFld">
+          <label for="stEmis">EMIS Code <span class="reqMark" aria-label="required">*</span></label>
+          <input type="text" id="stEmis" placeholder="e.g. EMIS12345" aria-required="true">
+        </div>
+        <div class="fFld" id="stClsField">
+          <label for="stCls">Assigned Class</label>
+          <select id="stCls"><option value="">None</option></select>
+        </div>
+      </div>
+      <div class="fRow">
+        <div class="fFld">
+          <label for="stContact">Contact Number</label>
+          <input type="tel" id="stContact" placeholder="0244xxxxxx">
+        </div>
+        <div class="fFld">
+          <label for="stBankName">Bank Name</label>
+          <input type="text" id="stBankName" placeholder="e.g. GCB Bank">
+        </div>
+      </div>
+      <div class="fRow">
+        <div class="fFld">
+          <label for="stBank">Bank Account Number</label>
+          <div class="inputReveal">
+            <input type="password" id="stBank" placeholder="Account number" autocomplete="off">
+            <button type="button" onclick="toggleReveal('stBank',this)" aria-label="Toggle account number visibility">
+              <i class="fas fa-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <div class="fFld"></div>
+      </div>
+      <div class="sDiv"><i class="fas fa-lock" aria-hidden="true"></i> Login Credentials</div>
+      <div class="fRow">
+        <div class="fFld">
+          <label for="stUser">Username <span class="reqMark" aria-label="required">*</span></label>
+          <input type="text" id="stUser" placeholder="e.g. kofi.asante" autocomplete="off" aria-required="true">
+        </div>
+        <div class="fFld">
+          <label for="stPass">Password <span class="reqMark" aria-label="required">*</span></label>
+          <div class="inputReveal">
+            <input type="password" id="stPass" placeholder="Set login password" autocomplete="new-password" aria-required="true">
+            <button type="button" onclick="toggleReveal('stPass',this)" aria-label="Toggle password visibility">
+              <i class="fas fa-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="fErr" id="stErr" role="alert"></div>
+    </div>
+    <div class="mFoot">
+      <button class="btn btnO" onclick="closeM('mSt')" type="button">Cancel</button>
+      <button class="btn btnP" onclick="saveSt()" type="button">
+        <i class="fas fa-save" aria-hidden="true"></i> Save User
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Announcement Modal -->
+<div id="mAnn" style="display:none;" class="ov" role="dialog" aria-modal="true" aria-labelledby="mAnnTitle">
+  <div class="modal">
+    <div class="mHead">
+      <div class="mTitle" id="mAnnTitle">New Announcement</div>
+      <button class="mClose" onclick="closeM('mAnn')" aria-label="Close dialog" type="button">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="mBody">
+      <div class="fFld">
+        <label for="annTitle">Title <span class="reqMark" aria-label="required">*</span></label>
+        <input type="text" id="annTitle" placeholder="e.g. End of Term Examination Schedule" aria-required="true">
+      </div>
+      <div class="fFld">
+        <label for="annDate">Date</label>
+        <input type="date" id="annDate">
+      </div>
+      <div class="fFld">
+        <label for="annBody">Message <span class="reqMark" aria-label="required">*</span></label>
+        <textarea id="annBody" rows="4" placeholder="Write your announcement here…"
+                  style="resize:vertical;" aria-required="true"></textarea>
+      </div>
+      <div class="fErr" id="annErr" role="alert"></div>
+    </div>
+    <div class="mFoot">
+      <button class="btn btnO" onclick="closeM('mAnn')" type="button">Cancel</button>
+      <button class="btn btnP" onclick="saveAnn()" type="button">
+        <i class="fas fa-bullhorn" aria-hidden="true"></i> Post Announcement
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Gallery Modal -->
+<div id="mGal" style="display:none;" class="ov" role="dialog" aria-modal="true" aria-labelledby="mGalTitle">
+  <div class="modal">
+    <div class="mHead">
+      <div class="mTitle" id="mGalTitle">Add Photo to Gallery</div>
+      <button class="mClose" onclick="closeM('mGal')" aria-label="Close dialog" type="button">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="mBody">
+      <div class="fFld">
+        <label for="galTitle2">Photo Title <span class="reqMark" aria-label="required">*</span></label>
+        <input type="text" id="galTitle2" placeholder="e.g. Sports Day 2024" aria-required="true">
+      </div>
+      <div class="fFld">
+        <label for="galCat">Category</label>
+        <input type="text" id="galCat" placeholder="e.g. Events, Sports, Academic">
+      </div>
+      <div class="fFld">
+        <label for="galFile">Upload Photo <span class="reqMark" aria-label="required">*</span></label>
+        <input type="file" id="galFile" accept="image/*" onchange="previewGal(this)"
+               aria-required="true" style="width:100%; padding: 8px; border: 2px solid var(--g200); border-radius: 8px;">
+        <div id="galPreview" style="margin-top: 10px; height: 150px; background: var(--g100); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;" aria-hidden="true">
+          <i class="fas fa-image" style="font-size: 40px; color: var(--g300);"></i>
+        </div>
+      </div>
+      <div class="fErr" id="galErr" role="alert"></div>
+    </div>
+    <div class="mFoot">
+      <button class="btn btnO" onclick="closeM('mGal')" type="button">Cancel</button>
+      <button class="btn btnP" onclick="saveGal()" type="button">
+        <i class="fas fa-upload" aria-hidden="true"></i> Upload Photo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- FIX: Toast uses role="status" for screen reader announcements -->
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ======================================================
+     JAVASCRIPT — Modular, data-driven, no static hardcoded values
+     ====================================================== -->
+<script>
+'use strict';
+
+// =============================================
+// CONSTANTS
+// =============================================
+const CLASSES = ['KG 1A','KG 1B','KG 2','Basic 1','Basic 2','Basic 3','Basic 4','Basic 5','Basic 6','Basic 7','Basic 8','Basic 9'];
+const CLASS_CAPACITY = 50;
+
+const ADMIN_NAV = [
+  {id:'dashboard',   ic:'fas fa-th-large',           lb:'Dashboard'},
+  {id:'students',    ic:'fas fa-user-graduate',       lb:'Students'},
+  {id:'classes',     ic:'fas fa-chalkboard-teacher',  lb:'Classes & Enrollment'},
+  {id:'subjects',    ic:'fas fa-book-open',           lb:'Subject Management'},
+  {id:'staff',       ic:'fas fa-users',               lb:'Users'},
+  {id:'announcements',ic:'fas fa-bullhorn',           lb:'Announcements'},
+  {id:'gallery',     ic:'fas fa-images',              lb:'Gallery'},
+];
+const TEACHER_NAV = [
+  {id:'dashboard',    ic:'fas fa-th-large',     lb:'Dashboard'},
+  {id:'students',     ic:'fas fa-user-graduate',lb:'My Students'},
+  {id:'announcements',ic:'fas fa-bullhorn',     lb:'Announcements'},
+  {id:'gallery',      ic:'fas fa-images',       lb:'Gallery'},
+];
+
+// Simulated weekly attendance data (Mon–Fri percentages)
+const ATTENDANCE_DATA = {
+  labels: ['Mon','Tue','Wed','Thu','Fri'],
+  data:   [91, 88, 95, 93, 96]
+};
+
+// =============================================
+// DATABASE — localStorage persistence
+// FIX: Single source of truth, no hardcoded display values
+// =============================================
+const DB_KEY = 'stpauls_db_v7';
+let db = {
+  students: [],
+  staff: [{
+    id:'ST001', emis:'ADMIN001', name:'Administrator',
+    role:'admin', classAssigned:'', contact:'',
+    bankName:'', bank:'', username:'admin', password:'admin123'
+  }],
+  subjects: {},
+  announcements: [],
+  gallery: [],
+  settings: { term:'Term 2', year:'2024/2025', crest:null }
+};
+let cu  = null;     // current user
+let tempGalImg = null;
+let enrollChartShown = false;
+let chartInstances = {};  // FIX: track Chart.js instances to destroy before re-render
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (raw) db = JSON.parse(raw);
+  } catch(e) { console.warn('DB parse error:', e); }
+  if (db.settings?.crest) applyCrest(db.settings.crest);
+}
+function saveDB() {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+  catch(e) {
+    if (e.name === 'QuotaExceededError') {
+      toast('Storage full — some gallery images may not be saved.', 'warn');
+    }
+  }
+}
+loadDB();
+
+// =============================================
+// AUTH
+// =============================================
+function doLogin() {
+  const u = document.getElementById('lu').value.trim();
+  const p = document.getElementById('lp').value;
+
+  if (!u || !p) {
+    showLoginErr('Please enter both username and password.');
+    return;
+  }
+  const user = db.staff.find(s => s.username === u && s.password === p);
+  if (!user) {
+    showLoginErr('Invalid username or password. Please try again.');
+    return;
+  }
+  cu = user;
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('app').style.display    = 'block';
+  document.getElementById('lu').value = '';
+  document.getElementById('lp').value = '';
+  initApp();
+}
+
+// Allow pressing Enter on password field to submit
+document.getElementById('lp').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('lu').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+function showLoginErr(msg) {
+  const e = document.getElementById('loginErr');
+  document.getElementById('loginErrMsg').textContent = msg;
+  e.style.display = 'flex';
+}
+
+function doLogout() {
+  cu = null;
+  // Destroy all chart instances on logout
+  Object.values(chartInstances).forEach(c => { try { c.destroy(); } catch(e){} });
+  chartInstances = {};
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('app').style.display    = 'none';
+  document.getElementById('loginErr').style.display = 'none';
+}
+
+// =============================================
+// CREST
+// =============================================
+function handleCrest(input) {
+  if (!input.files?.[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    db.settings.crest = e.target.result;
+    saveDB();
+    applyCrest(e.target.result);
+    toast('School crest updated!');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function applyCrest(src) {
+  ['loginCrest','sbCrest'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = `<img src="${src}" alt="School crest">`;
+  });
+}
+
+// =============================================
+// APP INIT
+// =============================================
+function initApp() {
+  const isAdmin = cu.role === 'admin';
+
+  // User chip
+  document.getElementById('uAv').textContent  = cu.name.charAt(0).toUpperCase();
+  document.getElementById('uNm').textContent  = cu.name;
+  document.getElementById('uRl').textContent  = cu.role.charAt(0).toUpperCase() + cu.role.slice(1);
+
+  // Build nav
+  const nav    = isAdmin ? ADMIN_NAV : TEACHER_NAV;
+  const navEl  = document.getElementById('sbNav');
+  navEl.innerHTML = '';
+  nav.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ni' + (i === 0 ? ' active' : '');
+    btn.setAttribute('role', 'listitem');
+    btn.setAttribute('aria-current', i === 0 ? 'page' : 'false');
+    btn.innerHTML = `<i class="${item.ic}" aria-hidden="true"></i>${item.lb}`;
+    btn.onclick = () => navigate(item.id, btn, item.lb);
+    navEl.appendChild(btn);
+  });
+
+  // Show/hide role-gated elements
+  ['annAddBtn','galAddBtn','promoteBtn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isAdmin ? '' : 'none';
+  });
+
+  populateSels();
+  updateTermPill();
+
+  // Set default class filter for teachers
+  if (!isAdmin) {
+    const f = document.getElementById('stuCFilter');
+    if (f) f.value = cu.classAssigned || '';
+  }
+
+  navigate('dashboard', navEl.firstChild, 'Dashboard');
+}
+
+function navigate(sec, btn, title) {
+  document.querySelectorAll('.ni').forEach(n => {
+    n.classList.remove('active');
+    n.setAttribute('aria-current', 'false');
+  });
+  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-current', 'page'); }
+
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  const secEl = document.getElementById('sec-' + sec);
+  if (secEl) secEl.classList.add('active');
+
+  document.getElementById('pgTitle').textContent = title;
+
+  const renderMap = {
+    dashboard:     renderDash,
+    students:      renderStudents,
+    staff:         renderStaff,
+    classes:       renderClasses,
+    subjects:      renderSubjects,
+    announcements: renderAnn,
+    gallery:       renderGal
+  };
+  if (renderMap[sec]) renderMap[sec]();
+
+  if (window.innerWidth <= 768) closeSB();
+}
+
+// =============================================
+// SIDEBAR TOGGLE
+// =============================================
+function toggleSB() {
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('sbOverlay');
+  const btn = document.getElementById('menuBtn');
+  const open = sb.classList.toggle('open');
+  ov.classList.toggle('show', open);
+  btn.setAttribute('aria-expanded', String(open));
+}
+function closeSB() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('show');
+  document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+}
+
+function updateTermPill() {
+  const pill = document.getElementById('termPill');
+  if (pill) pill.textContent = `${db.settings.term} — ${db.settings.year}`;
+}
+
+function populateSels() {
+  const selConfigs = [
+    { id:'sCls',       blank: '' },
+    { id:'stCls',      blank: '<option value="">None</option>' },
+    { id:'stuCFilter', blank: '<option value="">All Classes</option>' },
+    { id:'subClsSel',  blank: '' },
+  ];
+  selConfigs.forEach(({ id, blank }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = blank + CLASSES.map(c => `<option value="${c}">${c}</option>`).join('');
+  });
+}
+
+// =============================================
+// FIX: DASHBOARD — fully dynamic data
+// =============================================
+function renderDash() {
+  const isAdmin = cu.role === 'admin';
+
+  // Stats cards
+  const statsEl = document.getElementById('dashStats');
+  if (isAdmin) {
+    const totalStudents = db.students.length;
+    const totalStaff    = db.staff.length;
+    statsEl.innerHTML = `
+      <div class="sCrd">
+        <div class="sIco iGreen" aria-hidden="true"><i class="fas fa-user-graduate"></i></div>
+        <div><div class="sVal">${totalStudents}</div><div class="sLbl">Total Students</div></div>
+      </div>
+      <div class="sCrd">
+        <div class="sIco iGold" aria-hidden="true"><i class="fas fa-users"></i></div>
+        <div><div class="sVal">${totalStaff}</div><div class="sLbl">Total Users</div></div>
+      </div>
+      <div class="sCrd">
+        <div class="sIco iBlue" aria-hidden="true"><i class="fas fa-images"></i></div>
+        <div><div class="sVal">${db.gallery.length}</div><div class="sLbl">Gallery Photos</div></div>
+      </div>
+      <div class="sCrd">
+        <div class="sIco iRed" aria-hidden="true"><i class="fas fa-bullhorn"></i></div>
+        <div><div class="sVal">${db.announcements.length}</div><div class="sLbl">Announcements</div></div>
+      </div>`;
+  } else {
+    const myCls = cu.classAssigned;
+    const cnt   = db.students.filter(s => s.cls === myCls).length;
+    statsEl.innerHTML = `
+      <div class="sCrd">
+        <div class="sIco iGreen" aria-hidden="true"><i class="fas fa-user-graduate"></i></div>
+        <div><div class="sVal">${cnt}</div><div class="sLbl">My Class (${myCls || 'Unassigned'})</div></div>
+      </div>
+      <div class="sCrd">
+        <div class="sIco iRed" aria-hidden="true"><i class="fas fa-bullhorn"></i></div>
+        <div><div class="sVal">${db.announcements.length}</div><div class="sLbl">Announcements</div></div>
+      </div>`;
+  }
+
+  // Recent announcements
+  const anns = db.announcements.slice(-3).reverse();
+  document.getElementById('dashAnn').innerHTML = anns.length
+    ? anns.map(a => `
+        <div style="padding:11px 0; border-bottom:1px solid var(--g100);">
+          <div style="font-weight:700; font-size:14px; color: var(--g800);">${escHtml(a.title)}</div>
+          <div style="font-size:11px; color:var(--g600); margin-top:2px;">${a.date || 'No date'}</div>
+        </div>`).join('')
+    : '<div class="empty" style="padding: 20px 0;"><p>No announcements yet</p></div>';
+
+  // Enrollment progress bars (dynamic from db)
+  const enroll = CLASSES.map(c => ({ c, n: db.students.filter(s => s.cls === c).length }));
+  document.getElementById('dashEnroll').innerHTML = enroll.map(e => {
+    const pct = Math.min(Math.round(e.n / CLASS_CAPACITY * 100), 100);
+    return `
+      <div style="display:flex; align-items:center; gap:12px; padding:7px 0; border-bottom:1px solid var(--g100);">
+        <div style="width:72px; font-size:12px; font-weight:700; color:var(--g700);">${e.c}</div>
+        <div style="flex:1;">
+          <div class="progB" role="progressbar" aria-valuenow="${e.n}" aria-valuemin="0" aria-valuemax="${CLASS_CAPACITY}" aria-label="${e.c} enrollment">
+            <div class="progF" style="width:${pct}%; background: ${pct > 90 ? 'var(--red)' : 'var(--g)'};"></div>
+          </div>
+        </div>
+        <div style="font-size:13px; font-weight:800; color:var(--g); width:24px; text-align:right;">${e.n}</div>
+      </div>`;
+  }).join('');
+
+  // FIX: Real Chart.js sparkline for attendance
+  const avg = Math.round(ATTENDANCE_DATA.data.reduce((a,b) => a+b, 0) / ATTENDANCE_DATA.data.length * 10) / 10;
+  document.getElementById('attBadge').innerHTML =
+    `<span style="font-size:22px; font-weight:800; color:var(--g);">${avg}%</span>
+     <span class="badge bGreen" style="font-size:10px; margin-left:6px;"><i class="fas fa-caret-up" aria-hidden="true"></i> avg</span>`;
+
+  renderAttendanceChart();
+}
+
+// FIX: Real Chart.js chart — destroys previous instance before re-drawing
+function renderAttendanceChart() {
+  const canvas = document.getElementById('attendanceChart');
+  if (!canvas) return;
+  if (chartInstances.attendance) { chartInstances.attendance.destroy(); }
+
+  chartInstances.attendance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: ATTENDANCE_DATA.labels,
+      datasets: [{
+        data: ATTENDANCE_DATA.data,
+        borderColor: '#1a5c38',
+        backgroundColor: 'rgba(26,92,56,0.1)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#1a5c38',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2.5,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => `${ctx.parsed.y}%` }
+      }},
+      scales: {
+        y: { min: 75, max: 100, ticks: { callback: v => v + '%', font: { size: 10 } }, grid: { color: '#f3f4f6' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// =============================================
+// STUDENTS
+// =============================================
+function renderStudents() {
+  const q   = (document.getElementById('stuSearch').value || '').toLowerCase();
+  const cf  = document.getElementById('stuCFilter').value;
+  const isAdmin = cu.role === 'admin';
+
+  let list = db.students;
+  if (!isAdmin) list = list.filter(s => s.cls === cu.classAssigned);
+  list = list.filter(s =>
+    (s.name.toLowerCase().includes(q) || s.adno.toLowerCase().includes(q)) &&
+    (cf ? s.cls === cf : true)
+  );
+
+  const countEl = document.getElementById('stuCount');
+  if (countEl) countEl.textContent = `${list.length} student${list.length !== 1 ? 's' : ''}`;
+
+  document.getElementById('stuTbody').innerHTML = list.length
+    ? list.map(s => `
+        <tr>
+          <td><span class="badge bGray">${escHtml(s.adno)}</span></td>
+          <td><strong>${escHtml(s.name)}</strong></td>
+          <td><span class="badge bGreen">${escHtml(s.cls)}</span></td>
+          <td>${escHtml(s.parent) || '—'}</td>
+          <td>${escHtml(s.phone)  || '—'}</td>
+          <td>${escHtml(s.nhis)   || '—'}</td>
+          <td style="display:flex; gap:6px;">
+            <button class="btn btnSm btnO btnIco" onclick="openStudentModal('${s.id}')"
+                    aria-label="Edit ${escHtml(s.name)}" type="button">
+              <i class="fas fa-edit" aria-hidden="true"></i>
+            </button>
+            ${isAdmin ? `<button class="btn btnSm btnD btnIco" onclick="delStu('${s.id}')"
+                                  aria-label="Delete ${escHtml(s.name)}" type="button">
+              <i class="fas fa-trash" aria-hidden="true"></i>
+            </button>` : ''}
+          </td>
+        </tr>`).join('')
+    : `<tr><td colspan="7"><div class="empty"><i class="fas fa-user-graduate" aria-hidden="true"></i><p>No students found</p></div></td></tr>`;
+}
+
+function openStudentModal(id) {
+  clearErr('sErr');
+  if (id) {
+    const s = db.students.find(x => x.id === id);
+    if (!s) return;
+    document.getElementById('mStuTitle').textContent = 'Edit Student';
+    document.getElementById('sId').value     = s.id;
+    document.getElementById('sAdno').value   = s.adno;
+    document.getElementById('sName').value   = s.name;
+    document.getElementById('sCls').value    = s.cls;
+    document.getElementById('sNhis').value   = s.nhis   || '';
+    document.getElementById('sParent').value = s.parent || '';
+    document.getElementById('sPhone').value  = s.phone  || '';
+  } else {
+    document.getElementById('mStuTitle').textContent = 'Add Student';
+    ['sId','sAdno','sName','sNhis','sParent','sPhone'].forEach(f => document.getElementById(f).value = '');
+    const clsSel = document.getElementById('sCls');
+    if (cu.role === 'teacher') {
+      clsSel.value    = cu.classAssigned;
+      clsSel.disabled = true;   // FIX: lock dropdown — teacher can't switch to another class
+    } else {
+      clsSel.disabled = false;  // admin can freely pick any class
+    }
+  }
+  // Also lock when editing — teacher can only edit students in their own class
+  if (id && cu.role === 'teacher') {
+    document.getElementById('sCls').disabled = true;
+  }
+  openM('mStu', 'sAdno');
+}
+
+function saveStu() {
+  const adno  = document.getElementById('sAdno').value.trim();
+  const name  = document.getElementById('sName').value.trim();
+  const cls   = document.getElementById('sCls').value;
+  if (!adno || !name || !cls) { showErr('sErr', 'Please fill in all required fields (Admission No., Name, Class).'); return; }
+
+  // FIX: enforce class restriction for teachers regardless of DOM manipulation
+  if (cu.role === 'teacher' && cls !== cu.classAssigned) {
+    showErr('sErr', `You can only add students to your assigned class (${cu.classAssigned}).`);
+    return;
+  }
+
+  const id  = document.getElementById('sId').value;
+  const obj = {
+    adno, name, cls,
+    nhis:   document.getElementById('sNhis').value.trim(),
+    parent: document.getElementById('sParent').value.trim(),
+    phone:  document.getElementById('sPhone').value.trim()
+  };
+
+  if (id) {
+    const idx = db.students.findIndex(x => x.id === id);
+    db.students[idx] = { ...db.students[idx], ...obj };
+  } else {
+    if (db.students.find(s => s.adno === adno)) {
+      showErr('sErr', `Admission number "${adno}" already exists.`);
+      return;
+    }
+    db.students.push({ id: 'STU' + Date.now(), ...obj });
+  }
+  saveDB(); closeM('mStu'); renderStudents(); toast('Student saved successfully!');
+}
+
+function delStu(id) {
+  const s = db.students.find(x => x.id === id);
+  if (!s) return;
+  if (confirm(`Delete student "${s.name}"? This cannot be undone.`)) {
+    db.students = db.students.filter(x => x.id !== id);
+    saveDB(); renderStudents(); toast('Student deleted.');
+  }
+}
+
+function promoteStudents() {
+  if (!db.students.length) { toast('No students to promote.'); return; }
+  if (confirm('Promote ALL students to the next class? Students in Basic 9 will be marked as Graduated.')) {
+    db.students = db.students.map(s => {
+      const i = CLASSES.indexOf(s.cls);
+      if (i >= 0 && i < CLASSES.length - 1) return { ...s, cls: CLASSES[i + 1] };
+      if (s.cls === 'Basic 9') return { ...s, cls: 'Graduated' };
+      return s;
+    });
+    saveDB(); renderStudents(); toast('All students promoted successfully!');
+  }
+}
+
+// =============================================
+// CLASSES
+// =============================================
+function renderClasses() {
+  enrollChartShown = false;
+  document.getElementById('enrollTable').style.display     = '';
+  document.getElementById('enrollChartWrap').style.display = 'none';
+  document.getElementById('enrollViewBtn').innerHTML = '<i class="fas fa-chart-bar" aria-hidden="true"></i> Chart View';
+
+  document.getElementById('clsTbody').innerHTML = CLASSES.map(c => {
+    const n   = db.students.filter(s => s.cls === c).length;
+    const pct = Math.round(n / CLASS_CAPACITY * 100);
+    return `
+      <tr>
+        <td><strong>${c}</strong></td>
+        <td>${n}</td>
+        <td>${CLASS_CAPACITY}</td>
+        <td>
+          <div class="progB" role="progressbar" aria-valuenow="${n}" aria-valuemin="0" aria-valuemax="${CLASS_CAPACITY}">
+            <div class="progF" style="width:${Math.min(pct,100)}%; background:${pct>90?'var(--red)':'var(--g)'};"></div>
+          </div>
+          <span style="font-size:10px; color:var(--g600);">${pct}%</span>
+        </td>
+        <td><span class="badge ${n > CLASS_CAPACITY * 0.9 ? 'bRed' : 'bGreen'}">${n > CLASS_CAPACITY * 0.9 ? 'Nearly Full' : 'Available'}</span></td>
+      </tr>`;
+  }).join('');
+}
+
+function toggleEnrollView() {
+  enrollChartShown = !enrollChartShown;
+  document.getElementById('enrollTable').style.display     = enrollChartShown ? 'none' : '';
+  document.getElementById('enrollChartWrap').style.display = enrollChartShown ? '' : 'none';
+  document.getElementById('enrollViewBtn').innerHTML = enrollChartShown
+    ? '<i class="fas fa-table" aria-hidden="true"></i> Table View'
+    : '<i class="fas fa-chart-bar" aria-hidden="true"></i> Chart View';
+
+  if (enrollChartShown) renderEnrollChart();
+}
+
+// FIX: Real bar chart for enrollment
+function renderEnrollChart() {
+  const canvas = document.getElementById('enrollChart');
+  if (!canvas) return;
+  if (chartInstances.enroll) chartInstances.enroll.destroy();
+
+  const counts = CLASSES.map(c => db.students.filter(s => s.cls === c).length);
+  chartInstances.enroll = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: CLASSES,
+      datasets: [{
+        label: 'Students Enrolled',
+        data: counts,
+        backgroundColor: counts.map(n => n > CLASS_CAPACITY * 0.9 ? 'rgba(220,38,38,0.7)' : 'rgba(26,92,56,0.7)'),
+        borderColor:     counts.map(n => n > CLASS_CAPACITY * 0.9 ? '#dc2626' : '#1a5c38'),
+        borderWidth: 1.5,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: CLASS_CAPACITY + 5, ticks: { font: { size: 11 } } },
+        x: { ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function saveSettings() {
+  db.settings.term = document.getElementById('selTerm').value;
+  db.settings.year = document.getElementById('selYear').value;
+  saveDB(); updateTermPill(); toast('Settings updated!');
+}
+
+// =============================================
+// SUBJECTS
+// =============================================
+function renderSubjects() {
+  const cls  = document.getElementById('subClsSel').value;
+  const subs = (db.subjects[cls] || []);
+  document.getElementById('subList').innerHTML = subs.length
+    ? subs.map((s, i) => `
+        <div class="badge bBlue" role="listitem" style="padding: 8px 15px; font-size: 13px; gap: 8px;">
+          ${escHtml(s)}
+          <button style="background:none;border:none;cursor:pointer;padding:0;color:inherit;margin-left:4px;"
+                  onclick="delSub('${escHtml(cls)}', ${i})"
+                  aria-label="Remove subject ${escHtml(s)}" type="button">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>`).join('')
+    : '<p style="color:var(--g500); font-size:13px;">No subjects added for this class.</p>';
+}
+function addSub() {
+  const cls  = document.getElementById('subClsSel').value;
+  const name = document.getElementById('newSubName').value.trim();
+  if (!name) { toast('Enter a subject name first.'); return; }
+  if (!db.subjects[cls]) db.subjects[cls] = [];
+  if (db.subjects[cls].includes(name)) { toast('Subject already exists for this class.'); return; }
+  db.subjects[cls].push(name);
+  document.getElementById('newSubName').value = '';
+  saveDB(); renderSubjects();
+}
+function delSub(cls, i) {
+  db.subjects[cls].splice(i, 1);
+  saveDB(); renderSubjects();
+}
+
+// =============================================
+// USERS
+// =============================================
+function renderStaff() {
+  document.getElementById('stTbody').innerHTML = db.staff.map(s => `
+    <tr>
+      <td><span class="badge bGray">${escHtml(s.emis) || '—'}</span></td>
+      <td><strong>${escHtml(s.name)}</strong></td>
+      <td><span class="badge ${s.role === 'admin' ? 'bGold' : 'bGreen'}">${s.role.toUpperCase()}</span></td>
+      <td>${escHtml(s.classAssigned) || '—'}</td>
+      <td>${escHtml(s.bankName)      || '—'}</td>
+      <td>${escHtml(s.contact)       || '—'}</td>
+      <td style="display:flex; gap:6px;">
+        <button class="btn btnSm btnO btnIco" onclick="openStaffModal('${s.id}')"
+                aria-label="Edit user ${escHtml(s.name)}" type="button">
+          <i class="fas fa-edit" aria-hidden="true"></i>
+        </button>
+        ${s.id !== 'ST001'
+          ? `<button class="btn btnSm btnD btnIco" onclick="delSt('${s.id}')"
+                      aria-label="Delete user ${escHtml(s.name)}" type="button">
+              <i class="fas fa-trash" aria-hidden="true"></i>
+            </button>`
+          : ''}
+      </td>
+    </tr>`).join('');
+}
+
+function openStaffModal(id) {
+  clearErr('stErr');
+  if (id) {
+    const s = db.staff.find(x => x.id === id);
+    if (!s) return;
+    document.getElementById('mStTitle').textContent   = 'Edit User';
+    document.getElementById('stId').value      = s.id;
+    document.getElementById('stEmis').value    = s.emis          || '';
+    document.getElementById('stName').value    = s.name;
+    document.getElementById('stRole').value    = s.role;
+    document.getElementById('stCls').value     = s.classAssigned || '';
+    document.getElementById('stContact').value = s.contact       || '';
+    document.getElementById('stBankName').value= s.bankName      || '';
+    document.getElementById('stBank').value    = s.bank          || '';
+    document.getElementById('stUser').value    = s.username;
+    document.getElementById('stPass').value    = s.password;
+  } else {
+    document.getElementById('mStTitle').textContent = 'Add New User';
+    ['stId','stEmis','stName','stContact','stBankName','stBank','stUser','stPass'].forEach(f =>
+      document.getElementById(f).value = '');
+    document.getElementById('stRole').value = 'teacher';
+    document.getElementById('stCls').value  = '';
+  }
+  toggleClsField();
+  openM('mSt', 'stName');
+}
+
+function saveSt() {
+  const emis = document.getElementById('stEmis').value.trim();
+  const name = document.getElementById('stName').value.trim();
+  const role = document.getElementById('stRole').value;
+  const user = document.getElementById('stUser').value.trim();
+  const pass = document.getElementById('stPass').value;
+
+  if (!emis || !name || !role || !user || !pass) {
+    showErr('stErr', 'Required fields: EMIS Code, Name, Role, Username and Password.');
+    return;
+  }
+
+  // FIX: check username uniqueness on create
+  const id = document.getElementById('stId').value;
+  const existing = db.staff.find(s => s.username === user && s.id !== id);
+  if (existing) { showErr('stErr', `Username "${user}" is already taken.`); return; }
+
+  const obj = {
+    emis, name, role,
+    classAssigned: document.getElementById('stCls').value,
+    contact:       document.getElementById('stContact').value.trim(),
+    bankName:      document.getElementById('stBankName').value.trim(),
+    bank:          document.getElementById('stBank').value,
+    username:      user,
+    password:      pass
+  };
+
+  if (id) {
+    const idx = db.staff.findIndex(x => x.id === id);
+    db.staff[idx] = { ...db.staff[idx], ...obj };
+  } else {
+    db.staff.push({ id: 'ST' + Date.now(), ...obj });
+  }
+  saveDB(); closeM('mSt'); renderStaff(); toast('User saved!');
+}
+
+function delSt(id) {
+  const s = db.staff.find(x => x.id === id);
+  if (!s) return;
+  if (confirm(`Delete user "${s.name}"?`)) {
+    db.staff = db.staff.filter(x => x.id !== id);
+    saveDB(); renderStaff(); toast('User deleted.');
+  }
+}
+function toggleClsField() {
+  document.getElementById('stClsField').style.display =
+    document.getElementById('stRole').value === 'teacher' ? '' : 'none';
+}
+
+// =============================================
+// ANNOUNCEMENTS
+// =============================================
+function renderAnn() {
+  const isAdmin = cu.role === 'admin';
+  document.getElementById('annList').innerHTML = db.announcements.length
+    ? db.announcements.slice().reverse().map(a => `
+        <div class="card">
+          <div class="cHead">
+            <div class="cTitle">${escHtml(a.title)}</div>
+            <div style="font-size:12px; color:var(--g600);">${a.date || ''}</div>
+          </div>
+          <div class="cBody">
+            <p style="font-size:14px; line-height:1.7; color:var(--g700);">${escHtml(a.message)}</p>
+            ${isAdmin ? `<button class="btn btnSm btnD" style="margin-top:15px;" onclick="delAnn('${a.id}')"
+                                  aria-label="Delete announcement: ${escHtml(a.title)}" type="button">
+              <i class="fas fa-trash" aria-hidden="true"></i> Delete
+            </button>` : ''}
+          </div>
+        </div>`).join('')
+    : '<div class="empty"><i class="fas fa-bullhorn" aria-hidden="true"></i><p>No announcements yet</p></div>';
+}
+
+function openAnnModal() {
+  ['annTitle','annBody'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('annDate').value = new Date().toISOString().split('T')[0];
+  clearErr('annErr');
+  openM('mAnn', 'annTitle');
+}
+function saveAnn() {
+  const title = document.getElementById('annTitle').value.trim();
+  const msg   = document.getElementById('annBody').value.trim();
+  if (!title || !msg) { showErr('annErr', 'Please fill in both Title and Message.'); return; }
+  db.announcements.push({
+    id:      Date.now(),
+    title,
+    message: msg,
+    date:    document.getElementById('annDate').value,
+    author:  cu.name
+  });
+  saveDB(); closeM('mAnn'); renderAnn(); toast('Announcement posted!');
+}
+function delAnn(id) {
+  if (confirm('Delete this announcement?')) {
+    db.announcements = db.announcements.filter(a => a.id != id);
+    saveDB(); renderAnn(); toast('Announcement deleted.');
+  }
+}
+
+// =============================================
+// GALLERY
+// =============================================
+function renderGal() {
+  document.getElementById('galGrid').innerHTML = db.gallery.length
+    ? db.gallery.slice().reverse().map(g => `
+        <div class="galCrd" role="listitem">
+          <div class="galImg">
+            <img src="${g.src}" alt="${escHtml(g.title)}" loading="lazy">
+          </div>
+          <div class="galInf">
+            <div class="galT">${escHtml(g.title)}</div>
+            <div class="galC">${escHtml(g.cat) || 'General'}</div>
+            ${cu.role === 'admin' ? `<button class="btn btnSm btnD" style="margin-top:10px; width:100%;"
+                                              onclick="delGal('${g.id}')"
+                                              aria-label="Remove photo: ${escHtml(g.title)}" type="button">
+              <i class="fas fa-trash" aria-hidden="true"></i> Remove
+            </button>` : ''}
+          </div>
+        </div>`).join('')
+    : '<div class="empty" style="grid-column:1/-1;"><i class="fas fa-images" aria-hidden="true"></i><p>No photos yet</p></div>';
+}
+
+function openGalModal() {
+  ['galTitle2','galCat'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('galFile').value = '';
+  document.getElementById('galPreview').innerHTML = '<i class="fas fa-image" style="font-size:40px; color:var(--g300);" aria-hidden="true"></i>';
+  tempGalImg = null;
+  clearErr('galErr');
+  openM('mGal', 'galTitle2');
+}
+function previewGal(input) {
+  if (!input.files?.[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    tempGalImg = e.target.result;
+    document.getElementById('galPreview').innerHTML = `<img src="${tempGalImg}" style="width:100%;height:100%;object-fit:cover;" alt="Preview">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function saveGal() {
+  const title = document.getElementById('galTitle2').value.trim();
+  if (!title)      { showErr('galErr', 'Please enter a photo title.'); return; }
+  if (!tempGalImg) { showErr('galErr', 'Please select a photo to upload.'); return; }
+  db.gallery.push({ id: Date.now(), title, cat: document.getElementById('galCat').value.trim(), src: tempGalImg });
+  saveDB(); closeM('mGal'); renderGal(); toast('Photo added to gallery!');
+}
+function delGal(id) {
+  if (confirm('Remove this photo from the gallery?')) {
+    db.gallery = db.gallery.filter(g => g.id != id);
+    saveDB(); renderGal(); toast('Photo removed.');
+  }
+}
+
+// =============================================
+// MODAL HELPERS — with focus trap
+// FIX: proper focus management & keyboard trap
+// =============================================
+let _focusTrapHandler = null;
+let _prevFocus = null;
+
+function openM(id, firstFieldId) {
+  _prevFocus = document.activeElement;
+  const modal = document.getElementById(id);
+  modal.style.display = 'flex';
+
+  // Focus first field after animation
+  setTimeout(() => {
+    const target = firstFieldId ? document.getElementById(firstFieldId) : null;
+    if (target) target.focus();
+    trapFocus(modal);
+  }, 50);
+
+  // Close on Escape
+  const escHandler = e => {
+    if (e.key === 'Escape') { closeM(id); document.removeEventListener('keydown', escHandler); }
+  };
+  document.addEventListener('keydown', escHandler);
+}
+
+function closeM(id) {
+  document.getElementById(id).style.display = 'none';
+  if (_focusTrapHandler) {
+    document.removeEventListener('keydown', _focusTrapHandler);
+    _focusTrapHandler = null;
+  }
+  if (_prevFocus) { _prevFocus.focus(); _prevFocus = null; }
+}
+
+function trapFocus(el) {
+  const focusable = el.querySelectorAll(
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  );
+  const first = focusable[0];
+  const last  = focusable[focusable.length - 1];
+
+  if (_focusTrapHandler) document.removeEventListener('keydown', _focusTrapHandler);
+  _focusTrapHandler = e => {
+    if (e.key !== 'Tab') return;
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  };
+  document.addEventListener('keydown', _focusTrapHandler);
+}
+
+// =============================================
+// UTILS
+// =============================================
+function toggleReveal(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}" aria-hidden="true"></i>`;
+  btn.setAttribute('aria-label', (show ? 'Hide' : 'Show') + ' value');
+}
+
+let _toastTimer = null;
+function toast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'warn' ? '#92400e' : 'var(--g800)';
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// FIX: Sanitise all user-generated HTML to prevent XSS
+function escHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent  = msg;
+  el.style.display = 'block';
+}
+function clearErr(id) {
+  const el = document.getElementById(id);
+  el.textContent  = '';
+  el.style.display = 'none';
+}
+</script>
+</body>
+</html>
